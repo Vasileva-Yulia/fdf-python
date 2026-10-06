@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Виртуальное окружение
+.venv/
+
+# Кэши инструментов
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE и система
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini
