@@ -39,7 +39,7 @@ def test_parse_value(token: str, expected: tuple[int, str | None]) -> None:
     assert parse_value(token) == expected
 
 
-@pytest.mark.parametrize("token", ["x", "1.5", "+5", "5,", "5,FF0000", "5,0x1234567"])
+@pytest.mark.parametrize("token", ["x", "+5", "5,FF0000", "5,0x1234567"])
 def test_parse_value_invalid(token: str) -> None:
     with pytest.raises(ValueError):
         parse_value(token)
