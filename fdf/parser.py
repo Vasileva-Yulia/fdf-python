@@ -6,22 +6,27 @@ from pathlib import Path
 from fdf.errors import MapFormatError
 from fdf.model import Map, Point
 
-# [0-9] вместо \d: \d пропускает и не-ASCII цифры, а int() принял бы ещё "+5" и "1_000"
+# проверяем регуляркой, потому что int() сам по себе принял бы и "+5", и "1_000"
 HEIGHT_RE = re.compile(r"-?[0-9]+")
 COLOR_RE = re.compile(r"0x([0-9a-f]{1,6})", re.IGNORECASE)
 
 
 def parse_value(token: str) -> tuple[int, str | None]:
     """'7' -> (7, None), '1,0xff' -> (1, '#0000FF')."""
-    height, comma, color = token.partition(",")
+    parts = token.split(",")
+    if len(parts) > 2:
+        raise ValueError(f"'{token}' — лишняя запятая")
+
+    height = parts[0]
     if not HEIGHT_RE.fullmatch(height):
-        raise ValueError(f"{height!r} — не целое число")
-    if not comma:
+        raise ValueError(f"'{height}' — не целое число")
+    if len(parts) == 1:
         return int(height), None
-    match = COLOR_RE.fullmatch(color)
+
+    match = COLOR_RE.fullmatch(parts[1])
     if match is None:
-        raise ValueError(f"{color!r} — некорректный цвет")
-    return int(height), "#" + match.group(1).upper().rjust(6, "0")
+        raise ValueError(f"'{parts[1]}' — некорректный цвет")
+    return int(height), f"#{int(match.group(1), 16):06X}"
 
 
 def parse_text(text: str) -> Map:
@@ -58,7 +63,9 @@ def parse_map(path: str | Path) -> Map:
     try:
         text = data.decode("utf-8-sig")  # -sig: пропускает BOM от Блокнота
     except UnicodeDecodeError as e:
-        line = data.count(b"\n", 0, e.start) + 1
-        column = e.start - data.rfind(b"\n", 0, e.start)
+        # e.start — номер байта, на котором декодер споткнулся
+        before = data[: e.start]
+        line = before.count(b"\n") + 1
+        column = len(before) - before.rfind(b"\n")
         raise MapFormatError(line, column, "файл не в кодировке UTF-8") from e
     return parse_text(text)
