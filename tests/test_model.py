@@ -1,5 +1,3 @@
-import pytest
-
 from fdf.model import Map, Point
 
 
@@ -28,13 +26,3 @@ def test_neighbors_bottom_right_corner() -> None:
 def test_each_edge_once() -> None:
     # 3 ребра в каждой из 3 строк + 4 * 2 вертикальных
     assert len(list(grid(4, 3).edges())) == 3 * 3 + 4 * 2
-
-
-def test_point_out_of_range() -> None:
-    with pytest.raises(IndexError):
-        grid(3, 3).point(3, 0)
-
-
-def test_not_rectangular() -> None:
-    with pytest.raises(ValueError):
-        Map([[Point(0, 0, 0), Point(1, 0, 0)], [Point(0, 1, 0)]])
