@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Установить зависимости
+        run: pip install pygame-ce pytest mypy ruff
+
+      - name: Линтер
+        run: ruff check .
+
+      - name: Проверка типов
+        run: mypy --strict fdf main.py
+
+      - name: Тесты
+        run: pytest -q
