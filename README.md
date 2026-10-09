@@ -54,6 +54,7 @@
 | `maps/` | Карты; в `maps/bad/` — карты с ошибками для тестов |
 
 ## Тесты
+![CI](https://github.com/Vasileva-Yulia/fdf-python/actions/workflows/ci.yml/badge.svg)
 
     pytest -q
     mypy --strict fdf main.py
